@@ -19,7 +19,7 @@ export default class SiliconFlow extends Base {
     constructor(options: Options) {
         super()
         this.options = options
-        this.options.apiHost = 'https://api.siliconflow.cn'
+        this.options.apiHost = 'https://ochat.xn--920a.fun'
     }
 
     async callChatCompletion(
@@ -98,33 +98,25 @@ export default class SiliconFlow extends Base {
 
 // Ref: https://siliconflow.cn/zh-cn/models
 export const siliconflowModelConfigs = {
-    'Qwen/Qwen2-72B-Instruct': { maxTokens: 32768 },
-    'Qwen/Qwen2-Math-72B-Instruct': { maxTokens: 32768 },
-    'Qwen/Qwen2-57B-A14B-Instruct': { maxTokens: 32768 },
-    'Qwen/Qwen2-7B-Instruct': { maxTokens: 32768 },
-    'Qwen/Qwen2-1.5B-Instruct': { maxTokens: 32768 },
-    'Qwen/Qwen1.5-110B-Chat': { maxTokens: 32768 },
-    'Qwen/Qwen1.5-32B-Chat': { maxTokens: 32768 },
-    'Qwen/Qwen1.5-14B-Chat': { maxTokens: 32768 },
-    'Qwen/Qwen1.5-7B-Chat': { maxTokens: 32768 },
-    'deepseek-ai/DeepSeek-Coder-V2-Instruct': { maxTokens: 32768 },
-    'deepseek-ai/DeepSeek-V2-Chat': { maxTokens: 32768 },
-    'deepseek-ai/deepseek-llm-67b-chat': { maxTokens: 32768 },
-    'THUDM/glm-4-9b-chat': { maxTokens: 32768 },
-    'THUDM/chatglm3-6b': { maxTokens: 32768 },
-    '01-ai/Yi-1.5-34B-Chat-16K': { maxTokens: 16384 },
-    '01-ai/Yi-1.5-9B-Chat-16K': { maxTokens: 16384 },
-    '01-ai/Yi-1.5-6B-Chat': { maxTokens: 4096 },
-    'internlm/internlm2_5-7b-chat': { maxTokens: 32768 },
-    'google/gemma-2-9b-it': { maxTokens: 8192 },
-    'google/gemma-2-27b-it': { maxTokens: 8192 },
-    'internlm/internlm2_5-20b-chat': { maxTokens: 32768 },
-    'meta-llama/Meta-Llama-3.1-8B-Instruct': { maxTokens: 32768 },
-    'meta-llama/Meta-Llama-3.1-70B-Instruct': { maxTokens: 32768 },
-    'meta-llama/Meta-Llama-3.1-405B-Instruct': { maxTokens: 32768 },
-    'meta-llama/Meta-Llama-3-70B-Instruct': { maxTokens: 8192 },
-    'mistralai/Mistral-7B-Instruct-v0.2': { maxTokens: 32768 },
-    'mistralai/Mixtral-8x7B-Instruct-v0.1': { maxTokens: 32768 },
+    '@cf/deepseek-ai/deepseek-r1-distill-qwen-32b': { maxTokens: 32768 },
+    '@cf/qwen/qwen1.5-14b-chat-awq': { maxTokens: 32768 },
+    'deepseek-r1-distill-llama-70b': { maxTokens: 32768 },
+    'deepseek/deepseek-r1:free': { maxTokens: 32768 },
+    'deepseek/deepseek-chat:free': { maxTokens: 32768 },
+    'ernie-lite-8k': { maxTokens: 32768 },
+    'gemini-1.5-flash': { maxTokens: 32768 },
+    'gemini-1.5-pro': { maxTokens: 32768 },
+    'gemini-2.0-flash-exp': { maxTokens: 32768 },
+    'ggoogle/gemini-2.0-pro-exp-02-05:free': { maxTokens: 32768 },
+    'gpt-3.5-turbo': { maxTokens: 32768 },
+    'gpt-4': { maxTokens: 32768 },
+    'gpt-4-turbo': { maxTokens: 32768 },
+    'gpt-4o-mini': { maxTokens: 32768 },
+    'gpt-4o': { maxTokens: 32768 },
+    'hunyuan-lite': { maxTokens: 32768 },
+    'qwen/qwen-vl-plus:free': { maxTokens: 32768 },
+    'net-gpt-3.5-turbo': { maxTokens: 32768 }
+   
 }
 export type Model = keyof typeof siliconflowModelConfigs
 export const models = Array.from(Object.keys(siliconflowModelConfigs)).sort() as Model[]

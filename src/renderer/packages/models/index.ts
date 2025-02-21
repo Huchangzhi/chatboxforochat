@@ -30,12 +30,12 @@ export function getModel(setting: Settings, config: Config) {
 }
 
 export const aiProviderNameHash = {
+    [ModelProvider.SiliconFlow]: 'Ochat API',
     [ModelProvider.OpenAI]: 'OpenAI API',
     [ModelProvider.Claude]: 'Claude API',
     [ModelProvider.ChatboxAI]: 'Chatbox AI',
     [ModelProvider.LMStudio]: 'LMStudio',
     [ModelProvider.Ollama]: 'Ollama',
-    [ModelProvider.SiliconFlow]: 'SiliconCloud API',
     [ModelProvider.PPIO]: 'PPIO',
 }
 
