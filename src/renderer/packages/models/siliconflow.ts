@@ -107,7 +107,7 @@ export const siliconflowModelConfigs = {
     'gemini-1.5-flash': { maxTokens: 32768 },
     'gemini-1.5-pro': { maxTokens: 32768 },
     'gemini-2.0-flash-exp': { maxTokens: 32768 },
-    'ggoogle/gemini-2.0-pro-exp-02-05:free': { maxTokens: 32768 },
+    'google/gemini-2.0-pro-exp-02-05:free': { maxTokens: 32768 },
     'gpt-3.5-turbo': { maxTokens: 32768 },
     'gpt-4': { maxTokens: 32768 },
     'gpt-4-turbo': { maxTokens: 32768 },

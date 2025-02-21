@@ -10,6 +10,8 @@ import PPIO from './ppio'
 
 export function getModel(setting: Settings, config: Config) {
     switch (setting.aiProvider) {
+        case ModelProvider.SiliconFlow:
+            return new SiliconFlow(setting)
         case ModelProvider.ChatboxAI:
             return new ChatboxAI(setting, config)
         case ModelProvider.OpenAI:
@@ -20,8 +22,6 @@ export function getModel(setting: Settings, config: Config) {
             return new Claude(setting)
         case ModelProvider.Ollama:
             return new Ollama(setting)
-        case ModelProvider.SiliconFlow:
-            return new SiliconFlow(setting)
         case ModelProvider.PPIO:
             return new PPIO(setting)
         default:
@@ -40,6 +40,11 @@ export const aiProviderNameHash = {
 }
 
 export const AIModelProviderMenuOptionList = [
+    {
+        value: ModelProvider.SiliconFlow,
+        label: aiProviderNameHash[ModelProvider.SiliconFlow],
+        disabled: false,
+    },
     {
         value: ModelProvider.ChatboxAI,
         label: aiProviderNameHash[ModelProvider.ChatboxAI],
@@ -67,11 +72,6 @@ export const AIModelProviderMenuOptionList = [
         disabled: false,
     },
     {
-        value: ModelProvider.SiliconFlow,
-        label: aiProviderNameHash[ModelProvider.SiliconFlow],
-        disabled: false,
-    },
-    {
         value: ModelProvider.PPIO,
         label: aiProviderNameHash[ModelProvider.PPIO],
         disabled: false,
@@ -92,6 +92,8 @@ export function getModelDisplayName(settings: Settings, sessionType: SessionType
                 return `OpenAI Custom Model (${name})`
             }
             return settings.model || 'unknown'
+        case ModelProvider.SiliconFlow:
+            return `SiliconCloud (${settings.siliconCloudModel})`
         case ModelProvider.Claude:
             return settings.claudeModel || 'unknown'
         case ModelProvider.ChatboxAI:
@@ -101,8 +103,6 @@ export function getModelDisplayName(settings: Settings, sessionType: SessionType
             return `Ollama (${settings.ollamaModel})`
         case ModelProvider.LMStudio:
             return `LMStudio (${settings.lmStudioModel})`
-        case ModelProvider.SiliconFlow:
-            return `SiliconCloud (${settings.siliconCloudModel})`
         case ModelProvider.PPIO:
             return `PPIO (${settings.ppioModel})`
         default:
