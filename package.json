@@ -25,7 +25,8 @@
         "check": "npx tsc --noEmit",
         "prettier": "cross-env prettier -w ./src/**/*.{ts,tsx,json,css}",
         "prepare": "husky",
-        "web:dev": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack serve --config ./.erb/configs/webpack.config.web.dev.ts"
+        "web:dev": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack serve --config ./.erb/configs/webpack.config.web.dev.ts",
+        "build:web": "cross-env NODE_ENV=production webpack --config ./.erb/configs/webpack.config.web.prod.ts"
     },
     "repository": {
         "type": "git",
