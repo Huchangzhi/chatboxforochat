@@ -114,6 +114,7 @@ export const siliconflowModelConfigs = {
     'gpt-4-turbo': { maxTokens: 32768 },
     'gpt-4o-mini': { maxTokens: 32768 },
     'gpt-4o': { maxTokens: 32768 },
+    'hunyuan-web': { maxTokens: 32768 },
     'hunyuan-lite': { maxTokens: 32768 },
     'qwen/qwen-vl-plus:free': { maxTokens: 32768 },
     'Qwen/Qwen2.5-VL-72B-Instruct': { maxTokens: 32768 },
