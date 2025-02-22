@@ -16,7 +16,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '16'  # 替换为你的项目所需的 Node.js 版本
+        node-version: '20'  # 替换为你的项目所需的 Node.js 版本
 
     # Step 3: 安装依赖
     - name: Install dependencies
