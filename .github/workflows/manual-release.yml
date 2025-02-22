@@ -1,0 +1,55 @@
+name: Manual Release
+
+on:
+  workflow_dispatch:  # 手动触发
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+    # Step 1: 检出代码
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Step 2: 设置 Node.js 环境
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'  # 替换为你的项目所需的 Node.js 版本
+
+    # Step 3: 安装依赖
+    - name: Install dependencies
+      run: npm install
+
+    # Step 4: 打包应用程序
+    - name: Build application
+      run: npm run package:win
+
+    # Step 5: 上传打包文件
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: packaged-app
+        path: release/build/Chatbox CE-0.10.4-Setup.exe
+
+    # Step 6: 发布 Release
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      with:
+        tag_name: ${{ github.event.inputs.version }}
+        release_name: Release ${{ github.event.inputs.version }}
+        draft: false
+        prerelease: false
+        body: |
+          This is the release for version ${{ github.event.inputs.version }}.
+
+    # Step 7: 上传文件到 Release
+    - name: Upload file to Release
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: release/build/Chatbox CE-0.10.4-Setup.exe
+        asset_name: Chatbox-CE-${{ github.event.inputs.version }}-Setup.exe
+        asset_content_type: application/octet-stream
