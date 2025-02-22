@@ -28,7 +28,7 @@ jobs:
 
     # Step 5: 上传打包文件
     - name: Upload artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
         name: packaged-app
         path: release/build/Chatbox CE-0.10.4-Setup.exe
@@ -44,6 +44,8 @@ jobs:
         prerelease: false
         body: |
           This is the release for version ${{ github.event.inputs.version }}.
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 使用内置的 GITHUB_TOKEN
 
     # Step 7: 上传文件到 Release
     - name: Upload file to Release
