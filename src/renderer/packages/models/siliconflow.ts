@@ -113,13 +113,13 @@ export const siliconflowModelConfigs = {
     'gpt-4': { maxTokens: 32768 },
     'gpt-4-turbo': { maxTokens: 32768 },
     'gpt-4o-mini': { maxTokens: 32768 },
+    'gpt-4o-web': { maxTokens: 32768 },
     'gpt-4o': { maxTokens: 32768 },
     'hunyuan-web': { maxTokens: 32768 },
     'hunyuan-lite': { maxTokens: 32768 },
     'qwen/qwen-vl-plus:free': { maxTokens: 32768 },
     'Qwen/Qwen2.5-VL-72B-Instruct': { maxTokens: 32768 },
-    'net-gpt-3.5-turbo': { maxTokens: 32768 }
-   
+    'phi-4': { maxTokens: 32768 }
 }
 export type Model = keyof typeof siliconflowModelConfigs
 export const models = Array.from(Object.keys(siliconflowModelConfigs)).sort() as Model[]
