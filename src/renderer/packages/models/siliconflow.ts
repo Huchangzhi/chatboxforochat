@@ -103,6 +103,7 @@ export const siliconflowModelConfigs = {
     'deepseek-r1-distill-llama-70b': { maxTokens: 32768 },
     'deepseek/deepseek-r1:free': { maxTokens: 32768 },
     'deepseek-ai/DeepSeek-R1': { maxTokens: 32768 },
+    'deepseek-r1-web': { maxTokens: 32768 },
     'deepseek-ai/DeepSeek-V3': { maxTokens: 32768 },
     'ernie-lite-8k': { maxTokens: 32768 },
     'gemini-1.5-flash': { maxTokens: 32768 },
