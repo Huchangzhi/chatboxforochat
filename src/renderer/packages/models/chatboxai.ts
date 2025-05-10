@@ -1,189 +1,131 @@
-import { ChatboxAILicenseDetail, ChatboxAIModel, Message, MessageRole } from 'src/shared/types'
-import Base, { onResultChange } from './base'
-import { API_ORIGIN } from '../remote'
-import { BaseError, ApiError, NetworkError, ChatboxAIAPIError } from './errors'
-import { parseJsonOrEmpty } from '@/lib/utils'
+import { apiRequest } from '@/utils/request'
+import { createGoogleGenerativeAI } from '@ai-sdk/google'
+import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
+import { ChatboxAILicenseDetail, ChatboxAIModel } from 'src/shared/types'
+import * as remote from '../remote'
+import AbstractAISDKModel from './abstract-ai-sdk'
+import { CallChatCompletionOptions, ModelHelpers, ModelInterface } from './types'
 
 export const chatboxAIModels: ChatboxAIModel[] = ['chatboxai-3.5', 'chatboxai-4']
 
+const helpers: ModelHelpers = {
+  isModelSupportVision: (model: string) => {
+    return !['gpt-3.5-turbo', 'o1-mini', 'o1-preview', 'DeepSeek-R1', 'DeepSeek-V3'].includes(model)
+  },
+  isModelSupportToolUse: (model: string) => {
+    return !['o1-mini', 'o1-preview', 'gemini-2.0-flash-exp', 'gemini-2.0-flash-exp-image-generation'].includes(model)
+  },
+}
+
 interface Options {
-    licenseKey?: string
-    chatboxAIModel?: ChatboxAIModel
-    licenseInstances?: {
-        [key: string]: string
-    }
-    licenseDetail?: ChatboxAILicenseDetail
-    language: string
-    temperature: number
+  licenseKey?: string
+  chatboxAIModel: ChatboxAIModel
+  licenseInstances?: {
+    [key: string]: string
+  }
+  licenseDetail?: ChatboxAILicenseDetail
+  language: string
+  dalleStyle: 'vivid' | 'natural'
+  temperature: number
 }
 
 interface Config {
-    uuid: string
+  uuid: string
 }
 
-export default class ChatboxAI extends Base {
-    public name = 'ChatboxAI'
+export default class ChatboxAI extends AbstractAISDKModel implements ModelInterface {
+  public name = 'ChatboxAI'
+  public static helpers = helpers
 
-    public options: Options
-    public config: Config
-    constructor(options: Options, config: Config) {
-        super()
-        this.options = options
-        this.config = config
+  constructor(public options: Options, public config: Config) {
+    super()
+  }
+
+  getChatModel(options: CallChatCompletionOptions) {
+    const license = this.options.licenseKey || ''
+    const instanceId = (this.options.licenseInstances ? this.options.licenseInstances[license] : '') || ''
+    if (this.options.chatboxAIModel.startsWith('gemini')) {
+      const provider = createGoogleGenerativeAI({
+        apiKey: this.options.licenseKey || '',
+        baseURL: `${remote.API_ORIGIN}/gateway/google-ai-studio/v1beta`,
+        headers: {
+          'Instance-Id': instanceId,
+          Authorization: `Bearer ${this.options.licenseKey || ''}`,
+        },
+      })
+      return provider.chat(this.options.chatboxAIModel, {
+        structuredOutputs: false,
+      })
+    } else {
+      const provider = createOpenAICompatible({
+        name: 'ChatboxAI',
+        apiKey: this.options.licenseKey || '',
+        baseURL: `${remote.API_ORIGIN}/gateway/openai/v1`,
+        headers: {
+          'Instance-Id': instanceId,
+        },
+      })
+      return provider.languageModel(this.options.chatboxAIModel)
     }
+  }
 
-    async callChatCompletion(rawMessages: Message[], signal?: AbortSignal, onResultChange?: onResultChange): Promise<string> {
-        const messages = await populateChatboxAIMessage(rawMessages)
-        const response = await this.post(
-            `${API_ORIGIN}/api/ai/chat`,
-            this.getHeaders(),
-            {
-                uuid: this.config.uuid,
-                model: this.options.chatboxAIModel || 'chatboxai-3.5',
-                messages,
-                temperature: this.options.temperature,
-                language: this.options.language,
-                stream: true,
-            },
-            signal
-        )
-        let result = ''
-        await this.handleSSE(response, (message) => {
-            if (message === '[DONE]') {
-                return
-            }
-            const data = JSON.parse(message)
-            if (data.error) {
-                throw new ApiError(`Error from Chatbox AI: ${JSON.stringify(data)}`)
-            }
-            const word = data.choices[0]?.delta?.content
-            if (word !== undefined) {
-                result += word
-                if (onResultChange) {
-                    onResultChange(result)
-                }
-            }
+  public async paint(
+    prompt: string,
+    num: number,
+    callback?: (picBase64: string) => any,
+    signal?: AbortSignal
+  ): Promise<string[]> {
+    const concurrence: Promise<string>[] = []
+    for (let i = 0; i < num; i++) {
+      concurrence.push(
+        this.callImageGeneration(prompt, signal).then((picBase64) => {
+          if (callback) {
+            callback(picBase64)
+          }
+          return picBase64
         })
-        return result
+      )
     }
+    return await Promise.all(concurrence)
+  }
 
-    getHeaders() {
-        const license = this.options.licenseKey || ''
-        const instanceId = (this.options.licenseInstances ? this.options.licenseInstances[license] : '') || ''
-        const headers: Record<string, string> = {
-            Authorization: license,
-            'Instance-Id': instanceId,
-            'Content-Type': 'application/json',
-        }
-        return headers
-    }
+  private async callImageGeneration(prompt: string, signal?: AbortSignal): Promise<string> {
+    const license = this.options.licenseKey || ''
+    const instanceId = (this.options.licenseInstances ? this.options.licenseInstances[license] : '') || ''
+    const res = await apiRequest.post(
+      `${remote.API_ORIGIN}/api/ai/paint`,
+      {
+        Authorization: `Bearer ${license}`,
+        'Instance-Id': instanceId,
+        'Content-Type': 'application/json',
+      },
+      {
+        prompt,
+        response_format: 'b64_json',
+        style: this.options.dalleStyle,
+        uuid: this.config.uuid,
+        language: this.options.language,
+      },
+      { signal }
+    )
+    const json = await res.json()
+    return json['data'][0]['b64_json']
+  }
 
-    async post(
-        url: string,
-        headers: Record<string, string>,
-        body: Record<string, any>,
-        signal?: AbortSignal,
-        retry = 3
-    ) {
-        let requestError: ApiError | NetworkError | null = null
-        for (let i = 0; i < retry + 1; i++) {
-            try {
-                const res = await fetch(url, {
-                    method: 'POST',
-                    headers,
-                    body: JSON.stringify(body),
-                    signal,
-                })
-                if (!res.ok) {
-                    const response = await res.text().catch((e) => '')
-                    const errorCodeName = parseJsonOrEmpty(response)?.error?.code
-                    const chatboxAIError = ChatboxAIAPIError.fromCodeName(response, errorCodeName)
-                    if (chatboxAIError) {
-                        throw chatboxAIError
-                    }
-                    throw new ApiError(`Status Code ${res.status}, ${response}`)
-                }
-                return res
-            } catch (e) {
-                if (e instanceof BaseError) {
-                    requestError = e
-                } else {
-                    const err = e as Error
-                    const origin = new URL(url).origin
-                    requestError = new NetworkError(err.message, origin)
-                }
-                await new Promise((resolve) => setTimeout(resolve, 500))
-            }
-        }
-        if (requestError) {
-            throw requestError
-        } else {
-            throw new Error('Unknown error')
-        }
-    }
+  isSupportSystemMessage() {
+    return ![
+      'o1-mini',
+      'gemini-2.0-flash-exp',
+      'gemini-2.0-flash-thinking-exp',
+      'gemini-2.0-flash-exp-image-generation',
+    ].includes(this.options.chatboxAIModel)
+  }
 
-    async get(
-        url: string,
-        headers: Record<string, string>,
-        signal?: AbortSignal,
-        retry = 3
-    ) {
-        let requestError: ApiError | NetworkError | null = null
-        for (let i = 0; i < retry + 1; i++) {
-            try {
-                const res = await fetch(url, {
-                    method: 'GET',
-                    headers,
-                    signal,
-                })
-                if (!res.ok) {
-                    const response = await res.text().catch((e) => '')
-                    const errorCodeName = parseJsonOrEmpty(response)?.error?.code
-                    const chatboxAIError = ChatboxAIAPIError.fromCodeName(response, errorCodeName)
-                    if (chatboxAIError) {
-                        throw chatboxAIError
-                    }
-                    throw new ApiError(`Status Code ${res.status}, ${response}`)
-                }
-                return res
-            } catch (e) {
-                if (e instanceof BaseError) {
-                    requestError = e
-                } else {
-                    const err = e as Error
-                    const origin = new URL(url).origin
-                    requestError = new NetworkError(err.message, origin)
-                }
-            }
-        }
-        if (requestError) {
-            throw requestError
-        } else {
-            throw new Error('Unknown error')
-        }
-    }
+  isSupportVision() {
+    return helpers.isModelSupportVision(this.options.chatboxAIModel)
+  }
 
-}
-
-export interface ChatboxAIMessage {
-    role: MessageRole
-    content: string
-    pictures?: {
-        base64?: string
-    }[]
-    files?: {
-        uuid: string
-    }[]
-}
-
-export async function populateChatboxAIMessage(rawMessages: Message[]): Promise<ChatboxAIMessage[]> {
-    const messages: ChatboxAIMessage[] = []
-    for (const raw of rawMessages) {
-        const newMessage: ChatboxAIMessage = {
-            role: raw.role,
-            content: raw.content,
-        }
-        messages.push(newMessage)
-    }
-    return messages
+  isSupportToolUse() {
+    return helpers.isModelSupportToolUse(this.options.chatboxAIModel)
+  }
 }

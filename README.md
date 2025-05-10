@@ -2,9 +2,7 @@
   <a href="README.md">English</a> |
   <a href="./doc/README-CN.md">简体中文</a>
 </p>
-
 > **⚠️ Web Support Notice**: The web application support is currently in Proof of Concept (POC) stage. It is provided AS-IS without any warranties. Use at your own risk.
-
 This is the repository for the Chatbox Community Edition, open-sourced under the GPLv3 license. For most users, I recommend using the Chatbox Official Edition (closed-source). It's still completely free, easy to install, and supports more of the latest features. You can get it below:
 
 ### Download for Desktop
@@ -40,7 +38,7 @@ This is the repository for the Chatbox Community Edition, open-sourced under the
       <a href='https://chatboxai.app/?c=download-mac-aarch'>
         <img src='./doc/statics/mac.png' style="height:24px; width: 24px" />
         <br />
-        <b>M1/M2</b>
+        <b style="white-space: nowrap;">Apple Silicon</b>
       </a>
     </td>
     <td align="center" valign="middle">
@@ -181,6 +179,7 @@ For more information: [chatboxai.app](https://chatboxai.app/)
     -   Français (French)
     -   Deutsch (German)
     -   Русский (Russian)
+    -   Español (Spanish)
 
 -   **And More...**  
     :sparkles: Constantly enhancing the experience with new features!
@@ -263,18 +262,13 @@ npm run package
 npm run package:all
 ```
 
-## Buy Me a Coffee
-
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/benn)
-
-
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Bin-Huang/chatbox&type=Date)](https://star-history.com/#Bin-Huang/chatbox&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=chatboxai/chatbox&type=Date)](https://star-history.com/#chatboxai/chatbox&Date)
 
 ## Contact
 
-[Twitter](https://twitter.com/benn_huang) | [Email](mailto:tohuangbin@gmail.com) | [Blog](https://bennhuang.com)
+[Twitter](https://x.com/ChatboxAI_HQ) | [Email](mailto:hi@chatboxai.com)
 
 ## License
 
